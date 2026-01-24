@@ -2,7 +2,8 @@
 set -e
 
 # Create build directory outside source
-mkdir -p build
+rm -f build
+mkdir build
 cd build
 
 # Run CMake with installation prefix
@@ -14,11 +15,12 @@ cmake \
 
 # Build MiKTeX
 echo "Building MiKTeX..."
-make -j$(nproc)
+make -j$(nproc) 2>&1 | tee build.log
 
 # Install
 echo "Installing MiKTeX..."
-make install
+make install 2>&1 | tee -a build.log
 
 echo "Build complete! MiKTeX installed to $HOME/miktex"
 echo "Add to PATH with: export PATH=\"\$HOME/miktex/bin:\$PATH\""
+echo "Full build log saved to: $(pwd)/build.log"
