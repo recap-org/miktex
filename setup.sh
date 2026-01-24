@@ -1,0 +1,51 @@
+#!/bin/bash
+set -e
+
+sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+  bison \
+  ca-certificates \
+  cmake \
+  curl \
+  dpkg-dev \
+  file \
+  flex \
+  g++ \
+  gcc \
+  gettext \
+  git \
+  libboost-locale-dev \
+  libbz2-dev \
+  libcairo2-dev \
+  libcurl4-openssl-dev \
+  libexpat1-dev \
+  libfontconfig1-dev \
+  libfreetype6-dev \
+  libfribidi-dev \
+  libgd-dev \
+  libgmp-dev \
+  libgraphite2-dev \
+  libharfbuzz-icu0 \
+  libharfbuzz-dev \
+  libhunspell-dev \
+  libicu-dev \
+  libjpeg-dev \
+  liblog4cxx-dev \
+  libmspack-dev \
+  libpixman-1-dev \
+  libpng-dev \
+  libpoppler-dev \
+  libpoppler-qt5-dev \
+  libpopt-dev \
+  libpotrace-dev \
+  libssl-dev \
+  liburiparser-dev \
+  libzzip-dev \
+  make \
+  qtbase5-dev \
+  qtdeclarative5-dev \
+  qtscript5-dev \
+  qttools5-dev \
+  xsltproc \
+  xz-utils \
+  libmpfi-dev \
+  libmpfr-dev
