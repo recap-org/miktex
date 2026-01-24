@@ -2,7 +2,7 @@
 set -e
 
 # Create build directory outside source
-rm -f build
+rm -rf build
 mkdir build
 cd build
 
