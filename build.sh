@@ -10,6 +10,9 @@ cd build
 # Using $HOME/miktex so no sudo is required for installation
 cmake \
   -DCMAKE_INSTALL_PREFIX="$HOME/miktex" \
+  -DUSE_SYSTEM_MPFI=FALSE \
+  -DUSE_SYSTEM_HARFBUZZ=FALSE \
+  -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \
   -DWITH_UI_QT=OFF \
   ../
 
