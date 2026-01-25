@@ -1,34 +1,12 @@
-# MiKTeX
+# MiKTeX for containers
 
-The [MiKTeX Project Page](https://miktex.org) is the place to go, if
-you are new to MiKTeX.
+This fork of [MiKTex](https://github.com/MiKTeX/miktex) builds opinionated binaries for integration into container images. There are two important features: 
 
-In short: MiKTeX is a modern C/C++ implementation of TeX & Friends for Windows, macOS and Linux. The MiKTeX source code is documented here:
-[https://docs.miktex.org/hacking/index.html](https://docs.miktex.org/hacking/index.html)
+1. Lightweight: our opinions allow lightweight builds; i.e., CLI only, for Ubuntu only.
+2. Cross-platform: we support both amd64 and arm64. 
 
-MiKTeX is also a scalable TeX distribution (["Just enough TeX"](https://miktex.org/kb/just-enough-tex)):
+## Build
 
-- you have the option to start with MiKTeX executables and some configuration files
-- in the course of authoring your documents, only necessary LaTeX packages, fonts etc.
-  will be downloaded and installed
+We provide a dev container that includes the required system prerequisites for build.
 
-## Building
-
-MiKTeX can be built on Windows and Unix-like (including macOS)
-systems.  Please consult these HOWTOs for platform-specific build
-instructions:
-
-- [https://miktex.org/howto/build-win](https://miktex.org/howto/build-win "Building MiKTeX (Windows)")
-- [https://miktex.org/howto/build-unx](https://miktex.org/howto/build-unx "Building MiKTeX (Unix-like)")
-- [https://miktex.org/howto/build-mac](https://miktex.org/howto/build-mac "Building MiKTeX (macOS)")
-
-In addition, you can try one of the Dockerized build environments to build MiKTeX:
-
-- [Ubuntu](https://github.com/MiKTeX/docker-miktex-build-ubuntu)
-- [Debian](https://github.com/MiKTeX/docker-miktex-build-debian)
-- [Fedora](https://github.com/MiKTeX/docker-miktex-build-fedora)
-- [openSUSE](https://github.com/MiKTeX/docker-miktex-build-opensuse)
-
-## Deep diving
-
-If you want to understand the MiKTeX source code, have a look at [HACKING.md](HACKING.md).
+## Installation

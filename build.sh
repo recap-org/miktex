@@ -2,14 +2,14 @@
 set -e
 
 # Create build directory outside source
-rm -rf build
-mkdir build
+rm -rf build out
+mkdir build out
 cd build
 
 # Run CMake with installation prefix
 # Using $HOME/miktex so no sudo is required for installation
 cmake \
-  -DCMAKE_INSTALL_PREFIX="$HOME/miktex" \
+  -DCMAKE_INSTALL_PREFIX="../out" \
   -DUSE_SYSTEM_MPFI=FALSE \
   -DUSE_SYSTEM_HARFBUZZ=FALSE \
   -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \

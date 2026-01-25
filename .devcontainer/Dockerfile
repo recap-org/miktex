@@ -1,7 +1,5 @@
-#!/bin/bash
-set -e
-
-sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y --no-install-recommends \
   bison \
   ca-certificates \
   cmake \
@@ -12,7 +10,6 @@ sudo apt-get update && sudo apt-get install -y --no-install-recommends \
   g++ \
   gcc \
   gettext \
-  git \
   libboost-locale-dev \
   libbz2-dev \
   libcairo2-dev \
@@ -24,8 +21,6 @@ sudo apt-get update && sudo apt-get install -y --no-install-recommends \
   libgd-dev \
   libgmp-dev \
   libgraphite2-dev \
-  libharfbuzz-icu0 \
-  libharfbuzz-dev \
   libhunspell-dev \
   libicu-dev \
   libjpeg-dev \
@@ -41,11 +36,6 @@ sudo apt-get update && sudo apt-get install -y --no-install-recommends \
   liburiparser-dev \
   libzzip-dev \
   make \
-  qtbase5-dev \
-  qtdeclarative5-dev \
-  qtscript5-dev \
-  qttools5-dev \
   xsltproc \
   xz-utils \
-  libmpfi-dev \
   libmpfr-dev
