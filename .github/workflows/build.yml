@@ -1,0 +1,167 @@
+name: Build, Test, and (Optionally) Release MiKTeX
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_tag:
+        description: 'Upstream MiKTeX tag to build (e.g. 25.12)'
+        required: true
+        type: string
+      publish_release:
+        description: 'Publish GitHub release with built artifacts'
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    name: Build and test (upstream tag + dev patches)
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch_label: x86_64
+          - runner: ubuntu-24.04-arm64
+            arch_label: arm64
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout repository (full history + tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/MiKTeX/miktex.git
+          git fetch upstream --tags
+
+      - name: Prepare build tree (upstream tag + dev patches)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git checkout "tags/${{ inputs.upstream_tag }}"
+          git checkout -B "build-${{ inputs.upstream_tag }}"
+          git merge --no-ff dev
+
+      - name: Show build commit
+        run: |
+          echo "Building commit:"
+          git --no-pager log -1 --oneline
+
+      - name: Build devcontainer image
+        run: |
+          docker build -f .devcontainer/Dockerfile -t miktex-ci:latest .
+
+      - name: Build MiKTeX inside devcontainer
+        run: |
+          docker run --rm \
+            -v "$PWD":/workspace \
+            -w /workspace \
+            miktex-ci:latest bash -lc './build.sh'
+
+      - name: Extract version and architecture metadata
+        id: meta
+        shell: bash
+        run: |
+          VERSION=$(grep "^MIKTEX_VERSION_STR:STRING=" build/CMakeCache.txt | cut -d= -f2)
+          OS=linux
+          ARCH=$(uname -m)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "arch=$OS-$ARCH" >> "$GITHUB_OUTPUT"
+
+      - name: Install MiKTeX into staging prefix
+        run: |
+          VERSION='${{ steps.meta.outputs.version }}'
+          ARCH='${{ steps.meta.outputs.arch }}'
+          STAGING_DIR="out/miktex-${VERSION}-${ARCH}"
+
+          docker run --rm \
+            -v "$PWD":/workspace \
+            -w /workspace \
+            miktex-ci:latest bash -lc \
+            "cd '$STAGING_DIR' && \
+             ./install.sh \
+               --from ./miktex \
+               --to /usr/local/miktex \
+               --user-dir /var/lib/miktex"
+
+      - name: Run test suite
+        run: |
+          VERSION='${{ steps.meta.outputs.version }}'
+          ARCH='${{ steps.meta.outputs.arch }}'
+          STAGING_DIR="out/miktex-${VERSION}-${ARCH}"
+
+          docker run --rm \
+            -v "$PWD":/workspace \
+            -w /workspace \
+            miktex-ci:latest bash -lc \
+            "cd '$STAGING_DIR' && ./test.sh"
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ matrix.arch_label }}
+          path: build/build.log
+          retention-days: 30
+
+      - name: Upload tarball
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: miktex-tarball-${{ matrix.arch_label }}
+          path: |
+            out/miktex-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.arch }}.tar.xz
+          retention-days: 30
+
+      - name: Upload test outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-output-${{ matrix.arch_label }}
+          path: |
+            out/miktex-${{ steps.meta.outputs.version }}-${{ steps.meta.outputs.arch }}/test-output/
+          retention-days: 30
+
+  release:
+    name: Publish GitHub release
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true
+    needs: build
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository (tags only)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Verify upstream tag exists
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/${{ inputs.upstream_tag }}" >/dev/null; then
+            echo "Tag '${{ inputs.upstream_tag }}' does not exist."
+            exit 1
+          fi
+
+      - name: List artifacts
+        run: |
+          find artifacts -type f -maxdepth 3 -print
+
+      - name: Create GitHub release (attach to upstream tag)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.upstream_tag }}
+          name: MiKTeX ${{ inputs.upstream_tag }} (RECAP build)
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/miktex-tarball-*/miktex-*.tar.xz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
