@@ -39,3 +39,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   xsltproc \
   xz-utils \
   libmpfr-dev
+ENV PATH=/usr/local/miktex/bin:$PATH

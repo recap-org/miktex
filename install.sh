@@ -1,7 +1,15 @@
 #!/bin/bash
 set -e
 
-miktexsetup finish --shared=yes
+MIKTEX_BASE_DIR=/usr/local/miktex
+MIKTEX_USER_DIR=/var/lib/miktex
+
+mkdir -p $MIKTEX_USER_DIR/{config,data,install}
+miktexsetup finish \
+	--shared=yes \
+	--user-config=$MIKTEX_USER_DIR/config \
+	--user-data=$MIKTEX_USER_DIR/data \
+	--user-install=$MIKTEX_USER_DIR/install
 initexmf --admin --set-config-value [MPM]AutoInstall=1
 miktex --admin packages update-package-database
 miktex --admin packages update
@@ -18,7 +26,7 @@ mpm --admin --install latexmk
 initexmf --admin --update-fndb
 
 # Ensure utf-8.def is resolvable (pdfLaTeX expects utf-8.def while base ships utf8.def)
-UTF_BASE_DIR=/usr/local/share/miktex-texmf/tex/latex/base
+UTF_BASE_DIR=$MIKTEX_BASE_DIR/texmfs/install/tex/latex/base
 if [ -d "$UTF_BASE_DIR" ]; then
 	if [ ! -e "$UTF_BASE_DIR/utf-8.def" ] && [ -e "$UTF_BASE_DIR/utf8.def" ]; then
 		ln -sf utf8.def "$UTF_BASE_DIR/utf-8.def"
@@ -26,12 +34,4 @@ if [ -d "$UTF_BASE_DIR" ]; then
 	fi
 fi
 
-# # Build formats for luatex, lualatex, and xelatex
-# echo "Building xelatex format..."
-# miktex --admin formats build xelatex
-
-# echo "Building luatex format..."
-# miktex --admin formats build luatex
-
-# echo "Building lualatex format..."
-# miktex --admin formats build lualatex
+echo "MiKTeX installation and configuration complete!"
