@@ -34,6 +34,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Configure git identity
+        run: |
+          git config --global user.email "github-actions@example.com"
+          git config --global user.name "GitHub Actions"
+
       - name: Add upstream remote
         run: |
           git remote add upstream https://github.com/MiKTeX/miktex.git
