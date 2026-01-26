@@ -8,8 +8,8 @@ cd build
 
 # Run CMake with installation prefix
 # Using $HOME/miktex so no sudo is required for installation
+  # -DCMAKE_INSTALL_PREFIX="../out" \
 cmake \
-  -DCMAKE_INSTALL_PREFIX="../out" \
   -DUSE_SYSTEM_MPFI=FALSE \
   -DUSE_SYSTEM_HARFBUZZ=FALSE \
   -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \
@@ -24,6 +24,6 @@ make -j$(nproc) 2>&1 | tee build.log
 echo "Installing MiKTeX..."
 make install 2>&1 | tee -a build.log
 
-echo "Build complete! MiKTeX installed to $HOME/miktex"
-echo "Add to PATH with: export PATH=\"\$HOME/miktex/bin:\$PATH\""
-echo "Full build log saved to: $(pwd)/build.log"
+echo "Build complete! MiKTeX installed"
+# echo "Add to PATH with: export PATH=\"\$HOME/miktex/bin:\$PATH\""
+# echo "Full build log saved to: $(pwd)/build.log"
