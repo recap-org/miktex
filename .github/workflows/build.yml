@@ -19,7 +19,7 @@ jobs:
   build:
     name: Build and test (upstream tag + dev patches)
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - runner: ubuntu-24.04
