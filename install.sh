@@ -15,6 +15,15 @@ mpm --admin --install etex
 mpm --admin --install lua-uni-algos
 mpm --admin --install latexmk
 
+# Ensure utf-8.def is resolvable (pdfLaTeX expects utf-8.def while base ships utf8.def)
+UTF_BASE_DIR=/usr/local/share/miktex-texmf/tex/latex/base
+if [ -d "$UTF_BASE_DIR" ]; then
+	if [ ! -e "$UTF_BASE_DIR/utf-8.def" ] && [ -e "$UTF_BASE_DIR/utf8.def" ]; then
+		ln -sf utf8.def "$UTF_BASE_DIR/utf-8.def"
+		initexmf --admin --update-fndb
+	fi
+fi
+
 # # Build formats for luatex, lualatex, and xelatex
 # echo "Building xelatex format..."
 # miktex --admin formats build xelatex

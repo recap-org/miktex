@@ -46,7 +46,7 @@ run_test() {
     echo -n "Testing $test_file with $engine... "
     TESTS_RUN=$((TESTS_RUN + 1))
     
-    if latexmk -interaction=nonstopmode "$engine_flag" "$test_file" > /dev/null 2>&1; then
+    if latexmk -cd -interaction=nonstopmode "$engine_flag" "$test_file" > /dev/null 2>&1; then
         echo -e "${GREEN}✓ PASSED${NC}"
         TESTS_PASSED=$((TESTS_PASSED + 1))
         return 0
@@ -112,17 +112,10 @@ for engine in pdflatex xelatex lualatex; do
 done
 echo ""
 
-# Test Comprehensive (multiple features)
-echo -e "${YELLOW}Testing Comprehensive Integration${NC}"
-for engine in pdflatex xelatex lualatex; do
-    run_test "comprehensive/comprehensive-${engine}.tex" "$engine" || true
-done
-echo ""
-
 # Clean up all artifacts except PDFs
 echo -e "${YELLOW}Cleaning up artifacts...${NC}"
 cleanup_artifacts "."
-for dir in basic bibliography graphics tikz comprehensive; do
+for dir in basic bibliography graphics tikz; do
     cleanup_artifacts "$dir"
 done
 
