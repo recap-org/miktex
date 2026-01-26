@@ -2,6 +2,14 @@
 /.vs
 /build
 /out
-/test/*
-!/test/*.tex
-!/test/*.bib
+*.pdf
+*.bbl
+*.blg
+*.aux
+*.log
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz

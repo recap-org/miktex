@@ -1,0 +1,48 @@
+% Test document for LuaLaTeX engine
+\documentclass{article}
+\usepackage[utf-8]{inputenc}
+\usepackage{fontspec}
+\usepackage{unicode-math}
+
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}
+
+\title{LuaLaTeX Basic Test}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Unicode Support}
+LuaLaTeX supports Unicode and Lua scripting. Testing: café, naïve, Москва
+
+\section{Lua Integration}
+LuaLaTeX provides direct access to Lua, enabling advanced text processing.
+
+\section{Text Rendering}
+Here is some simple text to verify that text rendering works correctly.
+
+\section{Font Styles}
+Here is \textbf{bold text}, \textit{italic text}, and \texttt{typewriter text}.
+
+\section{Mathematics}
+A simple equation: $E = mc^2$
+
+\[
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+\]
+
+\section{Lists}
+\begin{enumerate}
+  \item First item
+  \item Second item
+  \item Third item
+\end{enumerate}
+
+\section{Conclusion}
+LuaLaTeX has successfully compiled this document.
+
+\end{document}

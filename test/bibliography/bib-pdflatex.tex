@@ -1,0 +1,29 @@
+% Bibliography test for pdfLaTeX engine
+\documentclass{article}
+\usepackage[utf-8]{inputenc}
+\usepackage{cite}
+
+\title{Bibliography Test (pdfLaTeX)}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document tests bibliography functionality with pdfLaTeX.
+
+\section{References}
+The \LaTeX{} system was introduced by \cite{lamport1994}. 
+Einstein's groundbreaking work is documented in \cite{einstein1905}.
+For comprehensive information, see \cite{goossens1994}.
+MiKTeX provides an excellent distribution as shown in \cite{miktex2023}.
+
+\section{Conclusion}
+Bibliography support allows proper citation management.
+
+\bibliography{references}
+\bibliographystyle{plain}
+
+\end{document}

@@ -1,0 +1,49 @@
+% Graphics test for LuaLaTeX engine
+\documentclass{article}
+\usepackage{fontspec}
+\usepackage{graphicx}
+
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+
+\title{Graphics Test (LuaLaTeX)}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Image Inclusion}
+This document tests graphics inclusion with LuaLaTeX.
+
+\section{Test Image}
+The test image is included below:
+
+\begin{center}
+\includegraphics[width=4cm]{test-image.ppm}
+\end{center}
+
+\section{Scaled Image}
+The same image scaled to different sizes:
+
+\begin{center}
+\includegraphics[width=2cm]{test-image.ppm} \quad
+\includegraphics[width=3cm]{test-image.ppm} \quad
+\includegraphics[width=5cm]{test-image.ppm}
+\end{center}
+
+\section{Image with Caption}
+\begin{figure}[h]
+\centering
+\includegraphics[width=6cm]{test-image.ppm}
+\caption{Test image included with LuaLaTeX}
+\end{figure}
+
+\section{Lua Integration}
+LuaLaTeX provides advanced scripting while supporting graphics.
+
+\section{Conclusion}
+Graphics are successfully included and rendered with LuaLaTeX.
+
+\end{document}

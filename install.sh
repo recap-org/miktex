@@ -2,6 +2,7 @@
 set -e
 
 miktexsetup finish --shared=yes
+initexmf --admin --set-config-value [MPM]AutoInstall=1
 miktex --admin packages update-package-database
 miktex --admin packages update
 miktex packages update-package-database
@@ -14,12 +15,12 @@ mpm --admin --install etex
 mpm --admin --install lua-uni-algos
 mpm --admin --install latexmk
 
-# Build formats for luatex, lualatex, and xelatex
-echo "Building luatex format..."
-miktex --admin formats build luatex
+# # Build formats for luatex, lualatex, and xelatex
+# echo "Building xelatex format..."
+# miktex --admin formats build xelatex
 
-echo "Building lualatex format..."
-miktex --admin formats build lualatex
+# echo "Building luatex format..."
+# miktex --admin formats build luatex
 
-echo "Building xelatex format..."
-miktex --admin formats build xelatex
+# echo "Building lualatex format..."
+# miktex --admin formats build lualatex

@@ -1,0 +1,35 @@
+% Bibliography test for XeLaTeX engine
+\documentclass{article}
+\usepackage{fontspec}
+\usepackage{cite}
+
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+
+\title{Bibliography Test (XeLaTeX)}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document tests bibliography functionality with XeLaTeX.
+
+\section{References}
+The \LaTeX{} system was introduced by \cite{lamport1994}. 
+Einstein's groundbreaking work is documented in \cite{einstein1905}.
+For comprehensive information, see \cite{goossens1994}.
+MiKTeX provides an excellent distribution as shown in \cite{miktex2023}.
+
+\section{Unicode in References}
+XeLaTeX handles Unicode citations properly.
+
+\section{Conclusion}
+Bibliography support works correctly with XeLaTeX and Unicode.
+
+\bibliography{references}
+\bibliographystyle{plain}
+
+\end{document}

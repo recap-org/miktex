@@ -1,0 +1,43 @@
+% Graphics test for pdfLaTeX engine
+\documentclass{article}
+\usepackage[utf-8]{inputenc}
+\usepackage{graphicx}
+
+\title{Graphics Test (pdfLaTeX)}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Image Inclusion}
+This document tests graphics inclusion with pdfLaTeX.
+
+\section{Test Image}
+The test image is included below:
+
+\begin{center}
+\includegraphics[width=4cm]{test-image.ppm}
+\end{center}
+
+\section{Scaled Image}
+The same image scaled to different sizes:
+
+\begin{center}
+\includegraphics[width=2cm]{test-image.ppm} \quad
+\includegraphics[width=3cm]{test-image.ppm} \quad
+\includegraphics[width=5cm]{test-image.ppm}
+\end{center}
+
+\section{Image with Caption}
+\begin{figure}[h]
+\centering
+\includegraphics[width=6cm]{test-image.ppm}
+\caption{Test image included via graphicx package}
+\end{figure}
+
+\section{Conclusion}
+Graphics are successfully included and rendered with pdfLaTeX.
+
+\end{document}
