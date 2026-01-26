@@ -2,6 +2,6 @@
 /.vs
 /build
 /out
-/test/*.aux
-/test/*.log
-/test/*.pdf
+/test/*
+!/test/*.tex
+!/test/*.bib
