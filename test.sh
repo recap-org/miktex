@@ -43,10 +43,15 @@ run_test() {
     local engine=$2
     local engine_flag=${ENGINE_MAP[$engine]}
     
+    # Extract category (directory name) from test file path
+    local category=$(dirname "$test_file")
+    # Use absolute path since -cd changes to the source file directory
+    local outdir="$PWD/../test-output/$category"
+    
     echo -n "Testing $test_file with $engine... "
     TESTS_RUN=$((TESTS_RUN + 1))
     
-    if latexmk -cd -interaction=nonstopmode "$engine_flag" "$test_file" > /dev/null 2>&1; then
+    if latexmk -cd -outdir="$outdir" -interaction=nonstopmode "$engine_flag" "$test_file" > /dev/null 2>&1; then
         echo -e "${GREEN}✓ PASSED${NC}"
         TESTS_PASSED=$((TESTS_PASSED + 1))
         return 0
@@ -57,25 +62,9 @@ run_test() {
     fi
 }
 
-# Clean up artifacts, keeping only PDFs
-cleanup_artifacts() {
-    local dir=$1
-    find "$dir" -maxdepth 1 -type f \( \
-        -name '*.aux' \
-        -o -name '*.log' \
-        -o -name '*.fdb_latexmk' \
-        -o -name '*.fls' \
-        -o -name '*.out' \
-        -o -name '*.toc' \
-        -o -name '*.xdv' \
-        -o -name '*.auxlock' \
-        -o -name '*.figlist' \
-        -o -name '*.makefile' \
-        -o -name '*.dpth' \
-        -o -name '*.md5' \
-        -o -name '*.auxlock' \
-        \) -delete
-}
+# Create test-output directory structure
+rm -rf test-output
+mkdir -p test-output/{basic,bibliography,graphics,tikz}
 
 cd test
 
@@ -112,12 +101,9 @@ for engine in pdflatex xelatex lualatex; do
 done
 echo ""
 
-# Clean up all artifacts except PDFs
+# Clean up all artifacts except PDFs and logs
 echo -e "${YELLOW}Cleaning up artifacts...${NC}"
-cleanup_artifacts "."
-for dir in basic bibliography graphics tikz; do
-    cleanup_artifacts "$dir"
-done
+find ../test-output -type f ! -name '*.pdf' ! -name '*.log' -delete
 
 # Print summary
 echo "========================================="

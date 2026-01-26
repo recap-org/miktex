@@ -2,8 +2,8 @@
 set -e
 
 # Create build directory outside source
-rm -rf build out/miktex
-mkdir build out/miktex
+rm -rf build out
+mkdir -p build out/miktex
 cd build
 
 # Run CMake with installation prefix
@@ -16,11 +16,48 @@ cmake \
   ../
 
 # Build MiKTeX
-echo "Building MiKTeX..."
+echo "Running make..."
 make -j$(nproc) 2>&1 | tee build.log
 
 # Install
-echo "Installing MiKTeX..."
+echo "Running make install..."
 make install 2>&1 | tee -a build.log
 
+cd ..
+
+# Extract version and architecture
+echo "Extracting version and architecture..."
+VERSION=$(grep "^MIKTEX_VERSION_STR:STRING=" build/CMakeCache.txt 2>/dev/null | cut -d= -f2 || echo "unknown")
+
+# Detect architecture from host system
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+MACHINE=$(uname -m)
+ARCH="${OS}-${MACHINE}"
+
+echo "Version: $VERSION"
+echo "Architecture: $ARCH"
+
+# Create staging directory for tarball
+STAGING_DIR="out/miktex-${VERSION}-${ARCH}"
+echo "Creating staging directory: $STAGING_DIR"
+rm -rf "$STAGING_DIR"
+mkdir -p "$STAGING_DIR"
+
+# Copy files to staging directory
+echo "Copying files to staging directory..."
+cp install.sh "$STAGING_DIR/"
+mv out/miktex "$STAGING_DIR/miktex"
+cp test.sh "$STAGING_DIR/"
+cp -r test "$STAGING_DIR/"
+
+# Create tarball
+TARBALL="out/miktex-${VERSION}-${ARCH}.tar.xz"
+echo "Creating tarball: $TARBALL"
+tar -cJf "$TARBALL" -C out "miktex-${VERSION}-${ARCH}"
+
+echo ""
+echo "========================================="
 echo "Build complete!"
+echo "========================================="
+echo "Tarball created: $TARBALL"
+echo "========================================="

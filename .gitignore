@@ -2,14 +2,5 @@
 /.vs
 /build
 /out
-*.pdf
-*.bbl
-*.blg
-*.aux
-*.log
-*.toc
-*.lof
-*.lot
-*.fls
-*.fdb_latexmk
-*.synctex.gz
+
+/test-output
