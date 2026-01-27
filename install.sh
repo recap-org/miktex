@@ -50,6 +50,7 @@ cp -r "$MIKTEX_SOURCE_DIR/"* "$MIKTEX_BASE_DIR/"
 mkdir -p $MIKTEX_USER_DIR/{config,data,install}
 miktexsetup finish \
 	--shared=yes \
+	--verbose \
 	--user-config=$MIKTEX_USER_DIR/config \
 	--user-data=$MIKTEX_USER_DIR/data \
 	--user-install=$MIKTEX_USER_DIR/install
