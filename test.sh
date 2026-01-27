@@ -64,7 +64,7 @@ run_test() {
 
 # Create test-output directory structure
 rm -rf test-output
-mkdir -p test-output/{basic,bibliography,graphics,tikz}
+mkdir -p test-output/{basic,bibliography,graphics,tikz,fonts}
 
 cd test
 
@@ -99,6 +99,11 @@ echo -e "${YELLOW}Testing TikZ${NC}"
 for engine in pdflatex xelatex lualatex; do
     run_test "tikz/tikz-${engine}.tex" "$engine" || true
 done
+echo ""
+
+# Test Package-loaded Fonts
+echo -e "${YELLOW}Testing Package-loaded Fonts${NC}"
+run_test "fonts/fonts-pdflatex.tex" "pdflatex" || true
 echo ""
 
 # Clean up all artifacts except PDFs and logs

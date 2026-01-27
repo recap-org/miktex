@@ -1,0 +1,51 @@
+% Test document for package-loaded fonts with pdfLaTeX
+\documentclass{article}
+\usepackage[utf-8]{inputenc}
+
+% Load palatino font packages
+\usepackage{tgpagella} 
+\usepackage{mathpazo} 
+
+\title{pdfLaTeX Font Package Test}
+\author{MiKTeX Test Suite}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Palatino Font Test}
+This document tests the Palatino font package loaded via \texttt{usepackage}.
+The Palatino font should be applied to all text in this document.
+
+\section{Font Styles with Palatino}
+Here is \textbf{bold text in Palatino}, \textit{italic text in Palatino}, and \texttt{typewriter text}.
+
+\section{Mathematics with Palatino}
+A simple equation with Palatino font: $E = mc^2$
+
+\[
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+\]
+
+\section{Numbered Lists}
+\begin{enumerate}
+  \item First item in Palatino
+  \item Second item in Palatino
+  \item Third item in Palatino
+\end{enumerate}
+
+\section{Bulleted Lists}
+\begin{itemize}
+  \item Palatino font applies here
+  \item And here
+  \item And here too
+\end{itemize}
+
+\section{Multi-line Paragraph}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. This text should all be rendered in the Palatino font family.
+
+\section{Conclusion}
+pdfLaTeX has successfully compiled this document with the Palatino font package.
+
+\end{document}
