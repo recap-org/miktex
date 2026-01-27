@@ -90,9 +90,9 @@ initexmf --admin --mklinks
 # Optionally create convenience symlinks in /usr/local/bin for miktex-* binaries
 if [ "$CREATE_SYMLINKS" = true ]; then
 	echo "Creating symlinks in /usr/local/bin for miktex-* binaries..."
-	USER_BIN_DIR="$MIKTEX_USER_DIR/bin"
-	if [ -d "$USER_BIN_DIR" ]; then
-		for binpath in "$USER_BIN_DIR"/miktex-*; do
+	MIKTEX_BIN_DIR="$MIKTEX_BASE_DIR/bin"
+	if [ -d "$MIKTEX_BIN_DIR" ]; then
+		for binpath in "$MIKTEX_BIN_DIR"/miktex-*; do
 			if [ ! -e "$binpath" ]; then
 				continue
 			fi
@@ -107,7 +107,7 @@ if [ "$CREATE_SYMLINKS" = true ]; then
 			echo "Created symlink: $target -> $binpath"
 		done
 	else
-		echo "Warning: $USER_BIN_DIR does not exist; no symlinks created"
+		echo "Warning: $MIKTEX_BIN_DIR does not exist; no symlinks created"
 	fi
 fi
 
