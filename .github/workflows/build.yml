@@ -77,7 +77,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "arch=$OS-$ARCH" >> "$GITHUB_OUTPUT"
 
-      - name: Install MiKTeX into staging prefix
+      - name: Install MiKTeX and run test suite
         run: |
           VERSION='${{ steps.meta.outputs.version }}'
           ARCH='${{ steps.meta.outputs.arch }}'
@@ -91,20 +91,8 @@ jobs:
              ./install.sh \
                --from ./miktex \
                --to /usr/local/miktex \
-               --user-dir /var/lib/miktex \
-               --symlink"
-
-      - name: Run test suite
-        run: |
-          VERSION='${{ steps.meta.outputs.version }}'
-          ARCH='${{ steps.meta.outputs.arch }}'
-          STAGING_DIR="out/miktex-${VERSION}-${ARCH}"
-
-          docker run --rm \
-            -v "$PWD":/workspace \
-            -w /workspace \
-            miktex-ci:latest bash -lc \
-            "cd '$STAGING_DIR' && ./test.sh"
+               --user-dir /var/lib/miktex && \
+               ./test.sh"
 
       - name: Upload build log
         if: always()

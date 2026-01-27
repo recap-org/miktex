@@ -20,10 +20,6 @@ while [[ $# -gt 0 ]]; do
 			USER_DIR="$2"
 			shift 2
 			;;
-		--symlink)
-			CREATE_SYMLINKS=true
-			shift 1
-			;;
 		-h|--help)
 			echo "Usage: $0 [OPTIONS]"
 			echo "Options:"
@@ -86,29 +82,5 @@ if [ -d "$UTF_BASE_DIR" ]; then
 fi
 
 initexmf --admin --mklinks
-
-# Optionally create convenience symlinks in /usr/local/bin for miktex-* binaries
-if [ "$CREATE_SYMLINKS" = true ]; then
-	echo "Creating symlinks in /usr/local/bin for miktex-* binaries..."
-	MIKTEX_BIN_DIR="$MIKTEX_BASE_DIR/bin"
-	if [ -d "$MIKTEX_BIN_DIR" ]; then
-		for binpath in "$MIKTEX_BIN_DIR"/miktex-*; do
-			if [ ! -e "$binpath" ]; then
-				continue
-			fi
-			base=$(basename "$binpath")
-			name=${base#miktex-}
-			target="/usr/local/bin/$name"
-			if [ -e "$target" ]; then
-				echo "Skipping $target (already exists)"
-				continue
-			fi
-			ln -s "$binpath" "$target"
-			echo "Created symlink: $target -> $binpath"
-		done
-	else
-		echo "Warning: $MIKTEX_BIN_DIR does not exist; no symlinks created"
-	fi
-fi
 
 echo "MiKTeX installation and configuration complete!"
