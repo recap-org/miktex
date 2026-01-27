@@ -91,7 +91,8 @@ jobs:
              ./install.sh \
                --from ./miktex \
                --to /usr/local/miktex \
-               --user-dir /var/lib/miktex"
+               --user-dir /var/lib/miktex" \
+               --symlink
 
       - name: Run test suite
         run: |
