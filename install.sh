@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-
-# Symlink creation flag
-CREATE_SYMLINKS=false
-
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -58,29 +54,21 @@ initexmf \
   --user-install=$MIKTEX_USER_DIR/install
 initexmf --admin --set-config-value [MPM]AutoInstall=1
 initexmf --set-config-value [MPM]AutoInstall=1
+initexmf --admin --set-config-value [Core]InstallDocFiles=0
+initexmf --set-config-value [Core]InstallDocFiles=0
+initexmf --admin --set-config-value [Core]InstallSourceFiles=0
+initexmf --set-config-value [Core]InstallSourceFiles=0
 miktex --admin packages update-package-database
 miktex --admin packages update
 miktex packages update-package-database
 miktex packages update
 initexmf --update-fndb
-mpm --verbose --package-level=basic --upgrade
-
-# Install required packages for luatex/lualatex format creation
-echo "Installing required packages for luatex and xetex formats..."
-mpm --install etex
-mpm --install lua-uni-algos
-mpm --install latexmk
-initexmf --update-fndb
-
-# Ensure utf-8.def is resolvable (pdfLaTeX expects utf-8.def while base ships utf8.def)
-UTF_BASE_DIR=$MIKTEX_USER_DIR/install/tex/latex/base
-if [ -d "$UTF_BASE_DIR" ]; then
-	if [ ! -e "$UTF_BASE_DIR/utf-8.def" ] && [ -e "$UTF_BASE_DIR/utf8.def" ]; then
-		ln -sf utf8.def "$UTF_BASE_DIR/utf-8.def"
-		initexmf --update-fndb
-	fi
-fi
-
 initexmf --admin --mklinks
+
+# Clear MiKTeX caches
+rm -rf \
+  "$MIKTEX_USER_DIR"/data/miktex/cache \
+  "$MIKTEX_BASE_DIR"/texmfs/*/miktex/cache
+
 
 echo "MiKTeX installation and configuration complete!"
