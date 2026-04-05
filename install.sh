@@ -42,6 +42,16 @@ done
 USER_DIR="${USER_DIR:-$HOME/.miktex}"
 ARCH=$(uname -m)
 
+# Use sudo if available; skip if already root
+if command -v sudo &>/dev/null; then
+	SUDO=sudo
+elif [[ $(id -u) -eq 0 ]]; then
+	SUDO=""
+else
+	echo "Error: sudo is required when not running as root" >&2
+	exit 1
+fi
+
 # ── Obtain MiKTeX files ─────────────────────────────────────────────
 
 if [[ -n "$FROM_DIR" ]]; then
@@ -83,8 +93,8 @@ fi
 # ── Install binaries ────────────────────────────────────────────────
 
 echo "Installing MiKTeX to ${INSTALL_DIR}..."
-sudo mkdir -p "$INSTALL_DIR"
-sudo cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
+$SUDO mkdir -p "$INSTALL_DIR"
+$SUDO cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
 
 export PATH="${INSTALL_DIR}/bin:$PATH"
 
@@ -98,16 +108,16 @@ initexmf \
 	--user-install="$USER_DIR/install"
 
 # Admin + user settings
-sudo initexmf --admin --set-config-value '[MPM]AutoInstall=1'
+$SUDO initexmf --admin --set-config-value '[MPM]AutoInstall=1'
 initexmf --set-config-value '[MPM]AutoInstall=1'
-sudo initexmf --admin --set-config-value '[Core]InstallDocFiles=0'
+$SUDO initexmf --admin --set-config-value '[Core]InstallDocFiles=0'
 initexmf --set-config-value '[Core]InstallDocFiles=0'
-sudo initexmf --admin --set-config-value '[Core]InstallSourceFiles=0'
+$SUDO initexmf --admin --set-config-value '[Core]InstallSourceFiles=0'
 initexmf --set-config-value '[Core]InstallSourceFiles=0'
 
 # Update package database
-sudo miktex --admin packages update-package-database
-sudo miktex --admin packages update
+$SUDO miktex --admin packages update-package-database
+$SUDO miktex --admin packages update
 miktex packages update-package-database
 miktex packages update
 
@@ -127,7 +137,7 @@ if [[ -n "$UTF8_DEF" ]]; then
 fi
 
 # Create engine symlinks in PATH
-sudo initexmf --admin --mklinks
+$SUDO initexmf --admin --mklinks
 
 # ── Cleanup caches ───────────────────────────────────────────────────
 
