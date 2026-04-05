@@ -1,74 +1,138 @@
 #!/bin/bash
-set -e
+# Install MiKTeX (RECAP build) on Linux.
+#
+# Usage:
+#   curl -fsSL https://raw.githubusercontent.com/recap-org/miktex/dev/install.sh | bash
+#   curl -fsSL <url> | bash -s -- --version 26.2
+#   ./install.sh --from ./miktex          # local mode (CI)
+#
+# Run as a regular user with sudo privileges.
+set -euo pipefail
 
-# Parse command line arguments
+REPO="recap-org/miktex"
+INSTALL_DIR="/usr/local/miktex"
+USER_DIR=""
+VERSION=""
+FROM_DIR=""
+
+usage() {
+	cat <<-EOF
+	Usage: $0 [OPTIONS]
+	Options:
+	  --version VER   MiKTeX version to install (default: latest release)
+	  --from DIR      Install from a local directory instead of downloading
+	  --to DIR        Installation directory (default: /usr/local/miktex)
+	  --user-dir DIR  MiKTeX user data directory (default: ~/.miktex)
+	  -h, --help      Show this help message
+	EOF
+	exit 0
+}
+
 while [[ $# -gt 0 ]]; do
 	case $1 in
-		--from)
-			FROM_DIR="$2"
-			shift 2
-			;;
-		--to)
-			TO_DIR="$2"
-			shift 2
-			;;
-		--user-dir)
-			USER_DIR="$2"
-			shift 2
-			;;
-		-h|--help)
-			echo "Usage: $0 [OPTIONS]"
-			echo "Options:"
-			echo "  --from DIR          MiKTeX source directory to install from (default: ./miktex)"
-			echo "  --to DIR            Installation target directory (default: /usr/local/miktex)"
-			echo "  --user-dir DIR      MiKTeX user data directory (default: /var/lib/miktex)"
-			echo "  -h, --help          Show this help message"
-			exit 0
-			;;
-		*)
-			echo "Unknown option: $1"
-			echo "Use --help for usage information"
-			exit 1
-			;;
+		--version)  VERSION="$2";     shift 2 ;;
+		--from)     FROM_DIR="$2";    shift 2 ;;
+		--to)       INSTALL_DIR="$2"; shift 2 ;;
+		--user-dir) USER_DIR="$2";    shift 2 ;;
+		-h|--help)  usage ;;
+		*) echo "Unknown option: $1"; exit 1 ;;
 	esac
 done
 
-# Set defaults if not provided via parameters
-MIKTEX_SOURCE_DIR=${FROM_DIR:-./miktex}
-MIKTEX_BASE_DIR=${TO_DIR:-/usr/local/miktex}
-MIKTEX_USER_DIR=${USER_DIR:-/var/lib/miktex}
+USER_DIR="${USER_DIR:-$HOME/.miktex}"
+ARCH=$(uname -m)
 
-# Copy MiKTeX installation from source directory
-echo "Installing MiKTeX from $MIKTEX_SOURCE_DIR to $MIKTEX_BASE_DIR..."
-if [ ! -d "$MIKTEX_SOURCE_DIR" ]; then
-	echo "Error: Source directory $MIKTEX_SOURCE_DIR does not exist"
-	exit 1
+# ── Obtain MiKTeX files ─────────────────────────────────────────────
+
+if [[ -n "$FROM_DIR" ]]; then
+	# Local mode: install from an existing directory
+	if [[ ! -d "$FROM_DIR" ]]; then
+		echo "Error: source directory $FROM_DIR does not exist" >&2
+		exit 1
+	fi
+	SOURCE_DIR="$FROM_DIR"
+	CLEANUP=""
+else
+	# Download mode: fetch tarball from GitHub releases
+	if [[ -z "$VERSION" ]]; then
+		VERSION=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+			| grep '"tag_name"' | head -1 | cut -d'"' -f4)
+		if [[ -z "$VERSION" ]]; then
+			echo "Error: could not determine latest release" >&2
+			exit 1
+		fi
+	fi
+
+	TARBALL="miktex-${VERSION}-linux-${ARCH}.tar.xz"
+	URL="https://github.com/${REPO}/releases/download/${VERSION}/${TARBALL}"
+
+	TMPDIR=$(mktemp -d)
+	CLEANUP="$TMPDIR"
+	trap 'rm -rf "$CLEANUP"' EXIT
+
+	echo "Downloading MiKTeX ${VERSION} for ${ARCH}..."
+	curl -fSL "$URL" -o "${TMPDIR}/${TARBALL}"
+	tar -xJf "${TMPDIR}/${TARBALL}" -C "$TMPDIR"
+	SOURCE_DIR=$(find "$TMPDIR" -maxdepth 2 -type d -name miktex | head -1)
+	if [[ -z "$SOURCE_DIR" ]]; then
+		echo "Error: could not find miktex directory in tarball" >&2
+		exit 1
+	fi
 fi
-mkdir -p "$MIKTEX_BASE_DIR"
-cp -r "$MIKTEX_SOURCE_DIR/"* "$MIKTEX_BASE_DIR/"
 
-mkdir -p $MIKTEX_USER_DIR/{config,data,install}
+# ── Install binaries ────────────────────────────────────────────────
+
+echo "Installing MiKTeX to ${INSTALL_DIR}..."
+sudo mkdir -p "$INSTALL_DIR"
+sudo cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
+
+export PATH="${INSTALL_DIR}/bin:$PATH"
+
+# ── Configure ────────────────────────────────────────────────────────
+
+echo "Configuring MiKTeX..."
+mkdir -p "$USER_DIR"/{config,data,install}
 initexmf \
-  --user-config=$MIKTEX_USER_DIR/config \
-  --user-data=$MIKTEX_USER_DIR/data \
-  --user-install=$MIKTEX_USER_DIR/install
-initexmf --admin --set-config-value [MPM]AutoInstall=1
-initexmf --set-config-value [MPM]AutoInstall=1
-initexmf --admin --set-config-value [Core]InstallDocFiles=0
-initexmf --set-config-value [Core]InstallDocFiles=0
-initexmf --admin --set-config-value [Core]InstallSourceFiles=0
-initexmf --set-config-value [Core]InstallSourceFiles=0
-miktex --admin packages update-package-database
-miktex --admin packages update
+	--user-config="$USER_DIR/config" \
+	--user-data="$USER_DIR/data" \
+	--user-install="$USER_DIR/install"
+
+# Admin + user settings
+sudo initexmf --admin --set-config-value '[MPM]AutoInstall=1'
+initexmf --set-config-value '[MPM]AutoInstall=1'
+sudo initexmf --admin --set-config-value '[Core]InstallDocFiles=0'
+initexmf --set-config-value '[Core]InstallDocFiles=0'
+sudo initexmf --admin --set-config-value '[Core]InstallSourceFiles=0'
+initexmf --set-config-value '[Core]InstallSourceFiles=0'
+
+# Update package database
+sudo miktex --admin packages update-package-database
+sudo miktex --admin packages update
 miktex packages update-package-database
 miktex packages update
+
+# Install base packages
 initexmf --update-fndb
-initexmf --admin --mklinks
+mpm --verbose --package-level=basic --upgrade
+mpm --install etex
+mpm --install lua-uni-algos
+mpm --install xkeyval
+mpm --install latexmk
+initexmf --update-fndb
 
-# Clear MiKTeX caches
+# Symlink utf8.def workaround
+UTF8_DEF=$(find "$USER_DIR" -path "*/tex/latex/base/utf8.def" 2>/dev/null | head -1)
+if [[ -n "$UTF8_DEF" ]]; then
+	ln -sf utf8.def "$(dirname "$UTF8_DEF")/utf-8.def"
+fi
+
+# Create engine symlinks in PATH
+sudo initexmf --admin --mklinks
+
+# ── Cleanup caches ───────────────────────────────────────────────────
+
 rm -rf \
-  "$MIKTEX_USER_DIR"/data/miktex/cache \
-  "$MIKTEX_BASE_DIR"/texmfs/*/miktex/cache
+	"$USER_DIR"/data/miktex/cache \
+	"$INSTALL_DIR"/texmfs/*/miktex/cache
 
-
-echo "MiKTeX installation and configuration complete!"
+echo "MiKTeX installation complete!"

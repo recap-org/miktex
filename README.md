@@ -25,25 +25,30 @@ The tarball contains:
 
 ## Install
 
-Extract the tarball and run the installation script:
+Install the latest release with a single command (requires `curl`, `tar`, `sudo`):
 
 ```bash
-# Extract the tarball
-tar -xJf miktex-<version>-<arch>.tar.xz
-cd miktex-<version>-<arch>/
+curl -fsSL https://raw.githubusercontent.com/recap-org/miktex/dev/install.sh | bash
+```
 
-# Install with defaults (installs from ./miktex to /usr/local/miktex)
-sudo ./install.sh
+Pin a specific version:
 
-# Or customize installation paths
-sudo ./install.sh --from ./miktex --to /opt/miktex --user-dir /var/lib/miktex
+```bash
+curl -fsSL https://raw.githubusercontent.com/recap-org/miktex/dev/install.sh | bash -s -- --version 26.2
+```
+
+Or install from a local build:
+
+```bash
+./install.sh --from ./out/miktex
 ```
 
 ### Installation Options
 
-- `--from DIR` - MiKTeX source directory to install from (default: `./miktex`)
+- `--version VER` - MiKTeX version to install (default: latest release)
+- `--from DIR` - Install from a local directory instead of downloading
 - `--to DIR` - Installation target directory (default: `/usr/local/miktex`)
-- `--user-dir DIR` - MiKTeX user data directory (default: `/var/lib/miktex`)
+- `--user-dir DIR` - MiKTeX user data directory (default: `~/.miktex`)
 - `-h, --help` - Show help message
 
 ## Test
