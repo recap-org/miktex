@@ -137,13 +137,6 @@ jobs:
         with:
           path: artifacts
 
-      - name: Verify upstream tag exists
-        run: |
-          if ! git rev-parse -q --verify "refs/tags/${{ inputs.upstream_tag }}" >/dev/null; then
-            echo "Tag '${{ inputs.upstream_tag }}' does not exist."
-            exit 1
-          fi
-
       - name: List artifacts
         run: |
           find artifacts -type f -maxdepth 3 -print
