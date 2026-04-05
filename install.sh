@@ -97,38 +97,40 @@ $SUDO mkdir -p "$INSTALL_DIR"
 $SUDO cp -r "$SOURCE_DIR/"* "$INSTALL_DIR/"
 
 export PATH="${INSTALL_DIR}/bin:$PATH"
+INITEXMF="${INSTALL_DIR}/bin/initexmf"
+MIKTEX="${INSTALL_DIR}/bin/miktex"
+MPM="${INSTALL_DIR}/bin/mpm"
 
 # ── Configure ────────────────────────────────────────────────────────
 
 echo "Configuring MiKTeX..."
 mkdir -p "$USER_DIR"/{config,data,install}
-initexmf \
+"$INITEXMF" \
 	--user-config="$USER_DIR/config" \
 	--user-data="$USER_DIR/data" \
 	--user-install="$USER_DIR/install"
 
 # Admin + user settings
-$SUDO initexmf --admin --set-config-value '[MPM]AutoInstall=1'
-initexmf --set-config-value '[MPM]AutoInstall=1'
-$SUDO initexmf --admin --set-config-value '[Core]InstallDocFiles=0'
-initexmf --set-config-value '[Core]InstallDocFiles=0'
-$SUDO initexmf --admin --set-config-value '[Core]InstallSourceFiles=0'
-initexmf --set-config-value '[Core]InstallSourceFiles=0'
+$SUDO "$INITEXMF" --admin --set-config-value '[MPM]AutoInstall=1'
+"$INITEXMF" --set-config-value '[MPM]AutoInstall=1'
+$SUDO "$INITEXMF" --admin --set-config-value '[Core]InstallDocFiles=0'
+"$INITEXMF" --set-config-value '[Core]InstallDocFiles=0'
+$SUDO "$INITEXMF" --admin --set-config-value '[Core]InstallSourceFiles=0'
+"$INITEXMF" --set-config-value '[Core]InstallSourceFiles=0'
 
 # Update package database
-$SUDO miktex --admin packages update-package-database
-$SUDO miktex --admin packages update
-miktex packages update-package-database
-miktex packages update
+$SUDO "$MIKTEX" --admin packages update-package-database
+$SUDO "$MIKTEX" --admin packages update
+"$MIKTEX" packages update-package-database
+"$MIKTEX" packages update
 
 # Install base packages
-initexmf --update-fndb
-mpm --verbose --package-level=basic --upgrade
-mpm --install etex
-mpm --install lua-uni-algos
-mpm --install xkeyval
-mpm --install latexmk
-initexmf --update-fndb
+"$INITEXMF" --update-fndb
+"$MPM" --verbose --package-level=basic --upgrade
+for pkg in etex lua-uni-algos xkeyval latexmk; do
+	"$MPM" --install "$pkg" 2>/dev/null || true
+done
+"$INITEXMF" --update-fndb
 
 # Symlink utf8.def workaround
 UTF8_DEF=$(find "$USER_DIR" -path "*/tex/latex/base/utf8.def" 2>/dev/null | head -1)
@@ -137,12 +139,11 @@ if [[ -n "$UTF8_DEF" ]]; then
 fi
 
 # Create engine symlinks in PATH
-$SUDO initexmf --admin --mklinks
+$SUDO "$INITEXMF" --admin --mklinks
 
 # ── Cleanup caches ───────────────────────────────────────────────────
 
-rm -rf \
-	"$USER_DIR"/data/miktex/cache \
-	"$INSTALL_DIR"/texmfs/*/miktex/cache
+rm -rf "$USER_DIR"/data/miktex/cache
+$SUDO rm -rf "$INSTALL_DIR"/texmfs/*/miktex/cache
 
 echo "MiKTeX installation complete!"
