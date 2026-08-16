@@ -40,15 +40,25 @@ jobs:
           git config --global user.name "GitHub Actions"
 
       - name: Add upstream remote
+        env:
+          UPSTREAM_TAG: ${{ inputs.upstream_tag }}
         run: |
           git remote add upstream https://github.com/MiKTeX/miktex.git
-          git fetch upstream --tags
+          # Fetch only the requested tag, and --force it: a previous release job
+          # may have created a same-named tag on the fork pointing at a fork
+          # commit. A plain `fetch --tags` would exit 1 on that collision and,
+          # once past it, would leave us building the fork's commit instead of
+          # upstream's. The input names an upstream tag, so upstream wins.
+          git fetch --force --no-tags upstream \
+            "refs/tags/${UPSTREAM_TAG}:refs/tags/${UPSTREAM_TAG}"
 
       - name: Prepare build tree (upstream tag + dev patches)
         if: github.event_name == 'workflow_dispatch'
+        env:
+          UPSTREAM_TAG: ${{ inputs.upstream_tag }}
         run: |
-          git checkout "tags/${{ inputs.upstream_tag }}"
-          git checkout -B "build-${{ inputs.upstream_tag }}"
+          git checkout "tags/${UPSTREAM_TAG}"
+          git checkout -B "build-${UPSTREAM_TAG}"
           git merge --no-ff dev
 
       - name: Show build commit
