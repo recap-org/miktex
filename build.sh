@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+# Without pipefail, `make ... | tee` reports tee's exit status, so a failed
+# build would sail past `set -e` and produce an empty tarball.
+set -o pipefail
 
 # Create build directory outside source
 rm -rf build out
