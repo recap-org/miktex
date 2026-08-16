@@ -1,5 +1,12 @@
 # MiKTeX Change Log
 
+## 26.5 - 2026-5-13
+
+### Upgraded programs
+
+* dvipdfmx 20260404
+* luatex 1.25.7
+
 ## 26.2 - 2026-2-21
 
 ### Upgraded programs

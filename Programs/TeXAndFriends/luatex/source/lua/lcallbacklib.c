@@ -86,6 +86,7 @@ static const char *const callbacknames[] = {
     "process_pdf_image_content",
     "provide_charproc_data",
     "input_level_string",
+    "dvi_output",
     NULL
 };
 
@@ -598,10 +599,25 @@ static int callback_listf(lua_State * L)
     return 1;
 }
 
+
+static int callback_listidx(lua_State * L)
+{
+    int i;
+    luaL_checkstack(L, 3, "out of stack space");
+    lua_newtable(L);
+    for (i = 1; callbacknames[i]; i++) {
+        lua_pushinteger(L,i);      
+        lua_pushstring(L, callbacknames[i]);
+        lua_rawset(L, -3);
+    }
+    return 1;
+}
+
 static const struct luaL_Reg callbacklib[] = {
     {"find", callback_find},
     {"register", callback_register},
     {"list", callback_listf},
+    {"listidx", callback_listidx},
     {NULL, NULL}                /* sentinel */
 };
 

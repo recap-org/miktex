@@ -9,7 +9,7 @@
 ###############################################################################
 ## CMake controls
 
-cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -43,6 +43,7 @@ foreach(p ${cmake_policies_new})
 endforeach()
 
 list(APPEND cmake_policies_old
+    CMP0091
     CMP0167
 )
 
