@@ -4,6 +4,15 @@ set -e
 # build would sail past `set -e` and produce an empty tarball.
 set -o pipefail
 
+# The bootstrapping packages are downloaded at build time. The default
+# repository is ctan.org, which round-robins each request to an arbitrary CTAN
+# mirror -- and mirrors are not interchangeable here: many exclude the large
+# systems/win32/miktex tree (404), and some serve an incomplete TLS chain
+# (curl error 60). Pin an explicit mirror so the build is deterministic.
+# Override with MIKTEX_REPOSITORY if this one is ever unavailable; must end
+# with a slash, as CMake concatenates the file name onto it directly.
+MIKTEX_REPOSITORY="${MIKTEX_REPOSITORY:-https://mirrors.mit.edu/CTAN/systems/win32/miktex/tm/packages/}"
+
 # Create build directory outside source
 rm -rf build out
 mkdir -p build out/miktex
@@ -12,6 +21,7 @@ cd build
 # Run CMake with installation prefix
 cmake \
   -DCMAKE_INSTALL_PREFIX="../out/miktex" \
+  -DMIKTEX_DEFAULT_REPOSITORY="${MIKTEX_REPOSITORY}" \
   -DUSE_SYSTEM_MPFI=FALSE \
   -DUSE_SYSTEM_HARFBUZZ=FALSE \
   -DUSE_SYSTEM_HARFBUZZ_ICU=FALSE \
